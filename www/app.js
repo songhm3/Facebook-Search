@@ -1,29 +1,77 @@
 
-var keyword;
-
-var operation;
-
 $(function(){
-  operation="user";
-	$("#btnSubmit").click(function(e) {
-      keyword = $("#keywordInput").val();
+    $("#mForm").submit(function(event) {
       $.ajax({
             type: "GET",
-            url: "app.php",
-            data: { operation:operation, keyword:keyword }, 
+            url: "server/app.php",
+            data: { operation:"user", keyword:$("#keywordInput").val() }, 
             dataType: "json",
-            success: function(result,status,xhr)
+            success: function(result)
             {
-                alert(JSON.stringify(result)); // show response from the php script.
+                alert("success");
+                
+            },
+            error: function(error){
+
             }
+
+      });
+
+      // $.ajax({
+      //       type: "GET",
+      //       url: "server/app.php",
+      //       data: { operation:"page", keyword:keyword }, 
+      //       dataType: "json",
+      //       success: function(result,status,xhr)
+      //       {
+      //           //alert(JSON.stringify(result)); // show response from the php script.
+      //       }
             
 
-          });
+      //     });
 
-      e.preventDefault(); // avoid to execute the actual submit of the form.
+      // $.ajax({
+      //       type: "GET",
+      //       url: "server/app.php",
+      //       data: { operation:"event", keyword:keyword }, 
+      //       dataType: "json",
+      //       success: function(result,status,xhr)
+      //       {
+      //           //alert(JSON.stringify(result)); // show response from the php script.
+      //       }
+            
+
+      //     });
+
+      // $.ajax({
+      //       type: "GET",
+      //       url: "server/app.php",
+      //       data: { operation:"place", keyword:keyword }, 
+      //       dataType: "json",
+      //       success: function(result,status,xhr)
+      //       {
+      //           //alert(JSON.stringify(result)); // show response from the php script.
+      //       }
+            
+
+      //     });
+
+      // $.ajax({
+      //       type: "GET",
+      //       url: "server/app.php",
+      //       data: { operation:"group", keyword:keyword }, 
+      //       dataType: "json",
+      //       success: function(result,status,xhr)
+      //       {
+      //           //alert(JSON.stringify(result)); // show response from the php script.
+      //       }
+            
+
+      //     });
+
+      event.preventDefault();
+    });
+
 
   });
-
-
-});
 
