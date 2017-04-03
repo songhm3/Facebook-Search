@@ -1,3 +1,24 @@
+function responseClickFavorite(type,id,url,name){
+  
+
+  var btn = "#"+id;
+  if(localStorage.getItem(id)==null){
+    //alert("not storage");
+    var item = {type,id,url,name};
+    localStorage.setItem(id,item);
+    $(btn).html('<span class="glyphicon glyphicon-star" aria-hidden="true"></span>');
+  }else{
+    //alert("storage");
+    localStorage.removeItem(id);
+    $(btn).html('<span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>');
+  }
+  
+}
+
+function responseClickDetail(id){
+
+}
+
 
 $(function(){
     $("#mForm").submit(function(event) {
@@ -13,11 +34,18 @@ $(function(){
                 $("#tbUser").html("<thead><tr><th>#</th><th>Profile photo</th><th>Name</th><th>Favorite</th><th>Details</th></tr></thead>");
                 $("#tbUser").append('<tbody>');
                 var items= result["data"];
+                var type = "user";
                 for(var i=0 ; i < items.length; i++){
                   var imageurl = items[i]["picture"]["data"]["url"];
                   var name = items[i]["name"];
                   var id = items[i]["id"];
-                  var row = '<tr><th scope="row">'+(i+1)+'</th><td><image src="'+imageurl+'" width="40" height="30" /></td><td>'+name+'</td><td>'+name+'</td><td>'+name+'</td></tr>';
+                  var fav = localStorage.getItem(id)==null?'<span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>':'<span class="glyphicon glyphicon-star" aria-hidden="true"></span>';
+                  var row = '<tr><th scope="row">'+(i+1)+
+                            '</th><td><image src="'+imageurl+
+                             '" width="40" height="30" /></td><td>'+name+
+                             '</td><td>'+'<button type="button" class="btn btn-default btn-lg" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+name+'\')" >'+fav+'</button>'+
+                             '</td><td>'+'<button type="button" class="btn btn-default btn-lg" onClick="responseClickDetail(\''+id+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
+                             '</td></tr>';
                   $("#tbUser").append(row);
                 }
                 $("#tbUser").append('</tbody>');
@@ -87,4 +115,6 @@ $(function(){
 
 
   });
+
+
 
