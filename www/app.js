@@ -1,3 +1,24 @@
+
+//load Facebook SDK
+window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '1141555312636527',
+      xfbml      : true,
+      version    : 'v2.8'
+    });
+    FB.AppEvents.logPageView();
+  };
+
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "//connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+
+
+
 var latitude;
 var longitude;
 
@@ -75,7 +96,14 @@ function getPicture(index,id){
     });
 }
 
-function responseClickDetail(id){
+function responseClickBack(){
+  $(".detail").css("display","none");
+  $("table").css("display","table");
+  $("#btnFav").css("display","none");
+  $("#btnPost").css("display","none");
+}
+
+function responseClickDetail(type,id,imageurl,itemName){
     $.ajax({
             type: "GET",
             url: "server/app.php",   //relative to html which incorporates this script
@@ -91,6 +119,42 @@ function responseClickDetail(id){
             {
                 $("#progressAlbums").css("display","none");
                 $("#progressPosts").css("display","none");
+                $("#btnFav").css("display","inline-block");
+                $("#btnPost").css("display","inline-block");
+                $("#btnFav").click(function(){
+                  if(localStorage.getItem(id)==null){
+                    var item = {"type":type,"id":id,"url":imageurl,"name":itemName};
+                    localStorage.setItem(id,JSON.stringify(item));
+                    //alert($("#btnFav").html());
+                    $("#btnFav").html('<span class="glyphicon glyphicon-star" aria-hidden="true"></span>');
+                    //alert($("#btnFav").html());
+                    //alert("not storage");
+                  }else{
+                    localStorage.removeItem(id);
+                    $("#btnFav").html('<span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>');
+                    //alert("storage");
+                  }
+                  generateFav();
+                });
+
+                $("#btnPost").click(function(){
+                    FB.ui({
+                         app_id: '1141555312636527',
+                         method: 'feed',
+                         link: window.location.href,
+                         picture: imageurl,
+                         name: itemName,
+                         caption: "FB SEARCH FROM USC CSCI571",
+                         }, function(response){
+                         if (response && !response.error_message){
+                            alert("Posted Successfully");
+                         }
+                         else{
+                            alert("Not Posted");
+                         }
+                      });
+                });
+
 
                 if(result["albums"]){
                   var albums = result["albums"]["data"];
@@ -115,9 +179,16 @@ function responseClickDetail(id){
 
                 if(result["posts"]){
                   var posts = result["posts"]["data"];
+                  $(".postContainer").html('<ul class="list-group">');
                   for(var i = 0 ; i < posts.length; i++){
-                    
+                    $(".postContainer").append('<li class="list-group-item" ><image src="'+imageurl+
+                      '" width="30" height="40" /><div style="display:inline-block;"><span><b>'+itemName+
+                      '</b></span><br><small>'+posts[i]["created_time"]+'</small></div><br><br><p>'+posts[i]["message"]+'</p></li>');
+        
                   }
+                  $(".postContainer").append('</ul>');
+
+
 
                 }else{
                   $(".postContainer").html("<p>No data found.</p>");
@@ -168,7 +239,7 @@ $(function(){
                             '</th><td><image src="'+imageurl+
                              '" width="40" height="30" /></td><td>'+name+
                              '</td><td><button type="button" class="btn btn-default btn-lg" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+name+'\')" >'+fav+'</button>'+
-                             '</td><td><button type="button" class="btn btn-default btn-lg" onClick="responseClickDetail(\''+id+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
+                             '</td><td><button type="button" class="btn btn-default btn-lg" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+name+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
                              '</td></tr>';
                   $("#tbUser").append(row);
                 }
@@ -205,7 +276,7 @@ $(function(){
                             '</th><td><image src="'+imageurl+
                              '" width="40" height="30" /></td><td>'+name+
                              '</td><td><button type="button" class="btn btn-default btn-lg" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+name+'\')" >'+fav+'</button>'+
-                             '</td><td><button type="button" class="btn btn-default btn-lg" onClick="responseClickDetail(\''+id+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
+                             '</td><td><button type="button" class="btn btn-default btn-lg" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+name+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
                              '</td></tr>';
                   $("#tbPage").append(row);
                 }
@@ -241,7 +312,7 @@ $(function(){
                             '</th><td><image src="'+imageurl+
                              '" width="40" height="30" /></td><td>'+name+
                              '</td><td><button type="button" class="btn btn-default btn-lg" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+name+'\')" >'+fav+'</button>'+
-                             '</td><td><button type="button" class="btn btn-default btn-lg" onClick="responseClickDetail(\''+id+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
+                             '</td><td><button type="button" class="btn btn-default btn-lg" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+name+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
                              '</td></tr>';
                   $("#tbEvent").append(row);
                 }
@@ -277,7 +348,7 @@ $(function(){
                             '</th><td><image src="'+imageurl+
                              '" width="40" height="30" /></td><td>'+name+
                              '</td><td><button type="button" class="btn btn-default btn-lg" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+name+'\')" >'+fav+'</button>'+
-                             '</td><td><button type="button" class="btn btn-default btn-lg" onClick="responseClickDetail(\''+id+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
+                             '</td><td><button type="button" class="btn btn-default btn-lg" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+name+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
                              '</td></tr>';
                   $("#tbPlace").append(row);
                 }
@@ -313,7 +384,7 @@ $(function(){
                             '</th><td><image src="'+imageurl+
                              '" width="40" height="30" /></td><td>'+name+
                              '</td><td><button type="button" class="btn btn-default btn-lg" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+name+'\')" >'+fav+'</button>'+
-                             '</td><td><button type="button" class="btn btn-default btn-lg" onClick="responseClickDetail(\''+id+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
+                             '</td><td><button type="button" class="btn btn-default btn-lg" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+name+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
                              '</td></tr>';
                   $("#tbGroup").append(row);
                 }

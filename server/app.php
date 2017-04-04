@@ -26,12 +26,12 @@
 				}
 			$results = $response->getDecodedBody();
 			echo json_encode($results);
-			
+
 		}else if($operation=="detail"){
 			$id = $_GET["id"];
 			try {
 				  // Returns a `Facebook\FacebookResponse` object
-				  $response = $fb->get('/'.$id.'?fields=albums.limit(5){name,photos.limit(2){name,picture}},posts.limit(5){created_time}',ACCESS_TOKEN);
+				  $response = $fb->get('/'.$id.'?fields=albums.limit(5){name,photos.limit(2){name,picture}},posts.limit(5){created_time,message}',ACCESS_TOKEN);
 				} catch(Facebook\Exceptions\FacebookResponseException $e) {
 				  echo 'Graph returned an error: ' . $e->getMessage();
 				  exit;

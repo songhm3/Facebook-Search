@@ -12,6 +12,13 @@ div.detailBtns{
 	padding: 5px;
 }
 
+#btnPost{
+	float:right;
+}
+
+#btnFav{
+	float: right;
+}
 div.container {
 	width: 100%;
     display: inline-block;
@@ -31,4 +38,10 @@ div.posts{
     float: right;
     vertical-align:top;
     border: 1px solid #dddddd;
+}
+
+.list-group-item {
+    display: block;
+    border: 1px solid #dddddd;
+    margin: 20px;
 }
