@@ -1,0 +1,34 @@
+#btnPost{
+	
+  background-image : url("../images/facebook.png");
+  height: 45px;
+  width : 45px;
+  background-size: 80%;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+div.detailBtns{
+	padding: 5px;
+}
+
+div.container {
+	width: 100%;
+    display: inline-block;
+}
+
+div.albums {
+	width: 48%;
+    float:left;
+    vertical-align:top;
+    margin-left:0px;
+    margin-right:auto;
+    border: 1px solid #dddddd;
+}
+
+div.posts{
+	width: 48%;
+    float: right;
+    vertical-align:top;
+    border: 1px solid #dddddd;
+}
