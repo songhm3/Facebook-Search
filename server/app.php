@@ -11,11 +11,27 @@
 
 	if(isset($_GET["operation"])){
 		$operation = $_GET["operation"];
-		if($operation=="detail"){
-			$id = $_GET["detail"];
+		if($operation=="picture"){
+			$id = $_GET["id"];
 			try {
 				  // Returns a `Facebook\FacebookResponse` object
-				  $response = $fb->get('/'.$id.'?fields=albums.limit(5){name,photos.limit(2){name,picture}},posts.limit(5){created_time}', ACCESS_TOKEN);
+				  //$response = $fb->get('/'.$_GET["id"].'/picture', ACCESS_TOKEN);
+				$response = $fb->get('/'.$id.'/?fields=images', ACCESS_TOKEN);
+				} catch(Facebook\Exceptions\FacebookResponseException $e) {
+				  echo 'Graph returned an error: ' . $e->getMessage();
+				  exit;
+				} catch(Facebook\Exceptions\FacebookSDKException $e) {
+				  echo 'Facebook SDK returned an error: ' . $e->getMessage();
+				  exit;
+				}
+			$results = $response->getDecodedBody();
+			echo json_encode($results);
+			
+		}else if($operation=="detail"){
+			$id = $_GET["id"];
+			try {
+				  // Returns a `Facebook\FacebookResponse` object
+				  $response = $fb->get('/'.$id.'?fields=albums.limit(5){name,photos.limit(2){name,picture}},posts.limit(5){created_time}',ACCESS_TOKEN);
 				} catch(Facebook\Exceptions\FacebookResponseException $e) {
 				  echo 'Graph returned an error: ' . $e->getMessage();
 				  exit;
