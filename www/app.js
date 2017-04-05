@@ -29,6 +29,11 @@ function getLocation() {
         alert("Geolocation is not supported by this browser.");
     }
 }
+function responseClickTrash(type,id,url,name){
+  localStorage.removeItem(id);
+  generateFav();
+  $("#"+id).html('<span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>');
+}
 
 function generateFav(){
   if(localStorage.length!=0){
@@ -45,7 +50,7 @@ function generateFav(){
                 '</th><td><image src="'+imageurl+
                 '" width="40" height="30" /></td><td>'+name+
                 '</td><td>'+type+
-                '</td><td>'+'<button type="button" class="btn btn-default btn-lg" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+name+'\')" ><span class="glyphicon glyphicon-bookmark" aria-hidden="true"></span></button>'+
+                '</td><td>'+'<button type="button" class="btn btn-default btn-lg" onClick="responseClickTrash(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+name+'\')" ><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>'+
                 '</td><td>'+'<button type="button" class="btn btn-default btn-lg" onClick="responseClickDetail(\''+id+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
                 '</td></tr>';
       $("#tbFav").append(row);
@@ -67,9 +72,9 @@ function responseClickFavorite(type,id,url,name){
   var btn = "#"+id;
   if(localStorage.getItem(id)==null){
     //alert("not storage");
-    var item = {"type":type,"id":id,"url":url,"name":name};
+    var item = {"type":type,"id":id,"url":url,"name":unescape(name)};
     localStorage.setItem(id,JSON.stringify(item));
-    $(btn).html('<span class="glyphicon glyphicon-star" aria-hidden="true"></span>');
+    $(btn).html('<span class="glyphicon glyphicon-star" aria-hidden="true"   style="color:gold"> </span>');
   }else{
     //alert("storage");
     localStorage.removeItem(id);
@@ -123,10 +128,10 @@ function responseClickDetail(type,id,imageurl,itemName){
                 $("#btnPost").css("display","inline-block");
                 $("#btnFav").click(function(){
                   if(localStorage.getItem(id)==null){
-                    var item = {"type":type,"id":id,"url":imageurl,"name":itemName};
+                    var item = {"type":type,"id":id,"url":imageurl,"name":unescape(itemName)};
                     localStorage.setItem(id,JSON.stringify(item));
                     //alert($("#btnFav").html());
-                    $("#btnFav").html('<span class="glyphicon glyphicon-star" aria-hidden="true"></span>');
+                    $("#btnFav").html('<span class="glyphicon glyphicon-star" aria-hidden="true" style="color:gold"></span>');
                     //alert($("#btnFav").html());
                     //alert("not storage");
                   }else{
@@ -143,7 +148,7 @@ function responseClickDetail(type,id,imageurl,itemName){
                          method: 'feed',
                          link: window.location.href,
                          picture: imageurl,
-                         name: itemName,
+                         name: unescape(itemName),
                          caption: "FB SEARCH FROM USC CSCI571",
                          }, function(response){
                          if (response && !response.error_message){
@@ -182,7 +187,7 @@ function responseClickDetail(type,id,imageurl,itemName){
                   $(".postContainer").html('<ul class="list-group">');
                   for(var i = 0 ; i < posts.length; i++){
                     $(".postContainer").append('<li class="list-group-item" ><image src="'+imageurl+
-                      '" width="30" height="40" /><div style="display:inline-block;"><span><b>'+itemName+
+                      '" width="30" height="40" /><div style="display:inline-block;"><span><b>'+unescape(itemName)+
                       '</b></span><br><small>'+posts[i]["created_time"]+'</small></div><br><br><p>'+posts[i]["message"]+'</p></li>');
         
                   }
@@ -193,6 +198,57 @@ function responseClickDetail(type,id,imageurl,itemName){
                 }else{
                   $(".postContainer").html("<p>No data found.</p>");
                 }
+                
+            }
+
+      });
+}
+
+function responseClickPaging(type, pageUrl){
+
+  var ele;
+  if(type=="user") ele = "#tbUser";
+  else if(type=="page") ele = "#tbPage";
+  else if(type=="event") ele = "#tbEvent";
+  else if(type=="place") ele = "#tbPlace";
+  else if(type=="group") ele = "#tbGroup";
+  $.ajax({
+            type: "GET",
+            url: pageUrl,    
+            dataType: "json",
+            success: function(result)
+            {
+                //alert(result);
+                $(ele).html("<thead><tr><th>#</th><th>Profile photo</th><th>Name</th><th>Favorite</th><th>Details</th></tr></thead>");
+                $(ele).append('<tbody>');
+                var items= result["data"];
+
+                for(var i=0 ; i < items.length; i++){
+                  var imageurl = items[i]["picture"]["data"]["url"];
+                  var name = items[i]["name"];
+                  var id = items[i]["id"];
+                  var fav = (localStorage.getItem(id)==null)?"<span class='glyphicon glyphicon-star-empty' aria-hidden='true'></span>":'<span class="glyphicon glyphicon-star" aria-hidden="true" style="color:gold"></span>';
+                  var row = '<tr><th scope="row">'+(i+1)+
+                            '</th><td><image src="'+imageurl+
+                             '" width="40" height="30" /></td><td>'+name+
+                             '</td><td><button type="button" class="btn btn-default btn-lg" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" >'+fav+'</button>'+
+                             '</td><td><button type="button" class="btn btn-default btn-lg" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
+                             '</td></tr>';
+                  $(ele).append(row);
+                }
+                $(ele).append('</tbody>');
+
+                if(result["paging"]["previous"]&&result["paging"]["next"]){
+                  $("#"+type+" div.pagingBtn").html('<button type="button" class="btn btn-default" value="Previous" style="margin-right:20px;" onClick="responseClickPaging(\''+type+'\',\''+result["paging"]["previous"]+'\')">Next</button>');
+                  $("#"+type+" div.pagingBtn").append('<button type="button" class="btn btn-default" value="Next" onClick="responseClickPaging(\''+type+'\',\''+result["paging"]["next"]+'\')">Next</button>');
+                }else if(result["paging"]["previous"]){
+                  $("#"+type+" div.pagingBtn").html('<button type="button" class="btn btn-default" value="Previous" onClick="responseClickPaging(\''+type+'\',\''+result["paging"]["previous"]+'\')">Next</button>');
+                }else{
+                  $("#"+type+" div.pagingBtn").html('<button type="button" class="btn btn-default" value="Next" onClick="responseClickPaging(\''+type+'\',\''+result["paging"]["next"]+'\')">Next</button>');
+                }
+                
+                
+                $('a[href="#'+type+'"]').tab('show');
                 
             }
 
@@ -230,20 +286,24 @@ $(function(){
                 $("#tbUser").append('<tbody>');
                 var items= result["data"];
                 var type = "user";
+                var pageUrl = result["paging"]["next"];
                 for(var i=0 ; i < items.length; i++){
                   var imageurl = items[i]["picture"]["data"]["url"];
                   var name = items[i]["name"];
                   var id = items[i]["id"];
-                  var fav = (localStorage.getItem(id)==null)?'<span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>':'<span class="glyphicon glyphicon-star" aria-hidden="true"></span>';
+                  var fav = (localStorage.getItem(id)==null)?"<span class='glyphicon glyphicon-star-empty' aria-hidden='true'></span>":'<span class="glyphicon glyphicon-star" aria-hidden="true" style="color:gold"></span>';
                   var row = '<tr><th scope="row">'+(i+1)+
                             '</th><td><image src="'+imageurl+
                              '" width="40" height="30" /></td><td>'+name+
-                             '</td><td><button type="button" class="btn btn-default btn-lg" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+name+'\')" >'+fav+'</button>'+
-                             '</td><td><button type="button" class="btn btn-default btn-lg" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+name+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
+                             '</td><td><button type="button" class="btn btn-default btn-lg" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" >'+fav+'</button>'+
+                             '</td><td><button type="button" class="btn btn-default btn-lg" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
                              '</td></tr>';
                   $("#tbUser").append(row);
                 }
                 $("#tbUser").append('</tbody>');
+
+                $("#user div.pagingBtn").html('<button type="button" class="btn btn-default" value="Next" onClick="responseClickPaging(\''+type+'\',\''+pageUrl+'\')">Next</button>');
+                
                 $('a[href="#user"]').tab('show');
                 
             }
@@ -271,12 +331,12 @@ $(function(){
                   var imageurl = items[i]["picture"]["data"]["url"];
                   var name = items[i]["name"];
                   var id = items[i]["id"];
-                  var fav = localStorage.getItem(id)==null?'<span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>':'<span class="glyphicon glyphicon-star" aria-hidden="true"></span>';
+                  var fav = localStorage.getItem(id)==null?'<span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>':'<span class="glyphicon glyphicon-star" aria-hidden="true" style="color:gold"></span>';
                   var row = '<tr><th scope="row">'+(i+1)+
                             '</th><td><image src="'+imageurl+
                              '" width="40" height="30" /></td><td>'+name+
-                             '</td><td><button type="button" class="btn btn-default btn-lg" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+name+'\')" >'+fav+'</button>'+
-                             '</td><td><button type="button" class="btn btn-default btn-lg" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+name+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
+                             '</td><td><button type="button" class="btn btn-default btn-lg" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" >'+fav+'</button>'+
+                             '</td><td><button type="button" class="btn btn-default btn-lg" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
                              '</td></tr>';
                   $("#tbPage").append(row);
                 }
@@ -307,12 +367,12 @@ $(function(){
                   var imageurl = items[i]["picture"]["data"]["url"];
                   var name = items[i]["name"];
                   var id = items[i]["id"];
-                  var fav = localStorage.getItem(id)==null?'<span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>':'<span class="glyphicon glyphicon-star" aria-hidden="true"></span>';
+                  var fav = localStorage.getItem(id)==null?'<span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>':'<span class="glyphicon glyphicon-star" aria-hidden="true" style="color:gold"></span>';
                   var row = '<tr><th scope="row">'+(i+1)+
                             '</th><td><image src="'+imageurl+
                              '" width="40" height="30" /></td><td>'+name+
-                             '</td><td><button type="button" class="btn btn-default btn-lg" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+name+'\')" >'+fav+'</button>'+
-                             '</td><td><button type="button" class="btn btn-default btn-lg" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+name+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
+                             '</td><td><button type="button" class="btn btn-default btn-lg" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" >'+fav+'</button>'+
+                             '</td><td><button type="button" class="btn btn-default btn-lg" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
                              '</td></tr>';
                   $("#tbEvent").append(row);
                 }
@@ -343,12 +403,12 @@ $(function(){
                   var imageurl = items[i]["picture"]["data"]["url"];
                   var name = items[i]["name"];
                   var id = items[i]["id"];
-                  var fav = localStorage.getItem(id)==null?'<span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>':'<span class="glyphicon glyphicon-star" aria-hidden="true"></span>';
+                  var fav = localStorage.getItem(id)==null?'<span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>':'<span class="glyphicon glyphicon-star" aria-hidden="true" style="color:gold"></span>';
                   var row = '<tr><th scope="row">'+(i+1)+
                             '</th><td><image src="'+imageurl+
                              '" width="40" height="30" /></td><td>'+name+
-                             '</td><td><button type="button" class="btn btn-default btn-lg" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+name+'\')" >'+fav+'</button>'+
-                             '</td><td><button type="button" class="btn btn-default btn-lg" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+name+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
+                             '</td><td><button type="button" class="btn btn-default btn-lg" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" >'+fav+'</button>'+
+                             '</td><td><button type="button" class="btn btn-default btn-lg" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
                              '</td></tr>';
                   $("#tbPlace").append(row);
                 }
@@ -379,12 +439,12 @@ $(function(){
                   var imageurl = items[i]["picture"]["data"]["url"];
                   var name = items[i]["name"];
                   var id = items[i]["id"];
-                  var fav = localStorage.getItem(id)==null?'<span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>':'<span class="glyphicon glyphicon-star" aria-hidden="true"></span>';
+                  var fav = localStorage.getItem(id)==null?'<span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>':'<span class="glyphicon glyphicon-star" aria-hidden="true" style="color:gold"></span>';
                   var row = '<tr><th scope="row">'+(i+1)+
                             '</th><td><image src="'+imageurl+
                              '" width="40" height="30" /></td><td>'+name+
-                             '</td><td><button type="button" class="btn btn-default btn-lg" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+name+'\')" >'+fav+'</button>'+
-                             '</td><td><button type="button" class="btn btn-default btn-lg" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+name+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
+                             '</td><td><button type="button" class="btn btn-default btn-lg" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" >'+fav+'</button>'+
+                             '</td><td><button type="button" class="btn btn-default btn-lg" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
                              '</td></tr>';
                   $("#tbGroup").append(row);
                 }

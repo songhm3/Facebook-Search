@@ -1,3 +1,15 @@
+html, body {
+    margin: 0;
+    height: 100%;
+}
+
+
+.progess{
+	display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 #btnPost{
 	
   background-image : url("../images/facebook.png");
