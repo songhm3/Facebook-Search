@@ -50,8 +50,8 @@ function generateFav(){
                 '</th><td><image src="'+imageurl+
                 '" width="40" height="30" /></td><td>'+name+
                 '</td><td>'+type+
-                '</td><td>'+'<button type="button" class="btn btn-default btn-lg" onClick="responseClickTrash(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+name+'\')" ><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>'+
-                '</td><td>'+'<button type="button" class="btn btn-default btn-lg" onClick="responseClickDetail(\''+id+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
+                '</td><td>'+'<button type="button" class="btn btn-default" onClick="responseClickTrash(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" ><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>'+
+                '</td><td>'+'<button type="button" class="btn btn-default" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')"><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
                 '</td></tr>';
       $("#tbFav").append(row);
     }
@@ -92,10 +92,10 @@ function getPicture(index,id){
       dataType: "json",
       success: function(result)
       {
-          var imageurl = result["images"][result["images"].length-1]["source"];
+          var imageurl = result["images"][2]["source"];
           var ele = "#collapse"+index+" .panel-body";
           //alert(ele);
-          $(ele).append('<img style=" width:100%; " src="'+imageurl+'">');
+          $(ele).append('<img style=" width:100%; " src="'+imageurl+'"><br>');
       }
 
     });
@@ -107,6 +107,8 @@ function responseClickBack(){
   $("table").css("display","table");
   $("#btnFav").css("display","none");
   $("#btnPost").css("display","none");
+  $(".albumContainer").html("");
+  $(".postContainer").html("");
 }
 
 function responseClickDetail(type,id,imageurl,itemName){
@@ -174,31 +176,37 @@ function responseClickDetail(type,id,imageurl,itemName){
                     getPicture(i,albums[i]["photos"]["data"][0]["id"]);
                     getPicture(i,albums[i]["photos"]["data"][1]["id"]);
                     
-                    $(".albumContainer").append('<div class="panel panel-default"><div class="panel-heading" ><h4 class="panel-title"><a data-toggle="collapse" data-parent="#accordion" href="#collapse'+i+'">'+
+                    if(i==0) {
+                      $(".albumContainer").append('<div class="panel panel-default"><div class="panel-heading" ><h4 class="panel-title"><a data-toggle="collapse" data-parent="#accordion" href="#collapse'+i+'">'+
+                          name+'</a></h4></div><div id="collapse'+i+'" class="panel-collapse collapse in"><div class="panel-body">'+
+                        '</div></div></div>');
+                    }else{
+                      $(".albumContainer").append('<div class="panel panel-default"><div class="panel-heading" ><h4 class="panel-title"><a data-toggle="collapse" data-parent="#accordion" href="#collapse'+i+'">'+
                           name+'</a></h4></div><div id="collapse'+i+'" class="panel-collapse collapse"><div class="panel-body">'+
                         '</div></div></div>');
+                    }
                   }
                   $(".albumContainer").append('</div>');
                 }else{
                   //alert("No album data found");
-                  $(".albumContainer").html("<p>No data found.</p>");
+                  $(".albumContainer").html('<div class="well well-sm" style="background-color:#FCF8E3; " >No data found.</div>');
                 }
 
                 if(result["posts"]){
                   var posts = result["posts"]["data"];
-                  $(".postContainer").html('<ul class="list-group">');
+                  $(".postContainer").html('<ul class="list-group" >');
                   for(var i = 0 ; i < posts.length; i++){
-                    $(".postContainer").append('<li class="list-group-item" ><image src="'+imageurl+
-                      '" width="30" height="40" /><div style="display:inline-block;"><span><b>'+unescape(itemName)+
-                      '</b></span><br><small>'+posts[i]["created_time"]+'</small></div><br><br><p>'+posts[i]["message"]+'</p></li>');
+                    $(".postContainer").append('<li class="list-group-item" ><div><div style=" display : inline-block; vertical-align: middle; "><image src="'+imageurl+
+                      '" width="30" height="30" /></div><div style="display:inline-block; vertical-align: middle; margin-left:15px; "><span><b>'+unescape(itemName)+
+                      '</b></span><br><small>'+moment(posts[i]["created_time"]).utc().format("YYYY-MM-DD HH:mm:ss")+'</small></div></div><br><p>'+(posts[i]["message"]?posts[i]["message"]:"")+'</p></li>');
         
                   }
-                  $(".postContainer").append('</ul>');
+                  $(".postContainer").append('</ul><br>');
 
 
 
                 }else{
-                  $(".postContainer").html("<p>No data found.</p>");
+                  $(".postContainer").html('<div class="well well-sm" style="background-color:#FCF8E3; " >No data found.</div>');
                 }
                 
             }
@@ -233,18 +241,18 @@ function responseClickPaging(type, pageUrl){
                   var row = '<tr><th scope="row">'+(i+1)+
                             '</th><td><image src="'+imageurl+
                              '" width="40" height="30" /></td><td>'+name+
-                             '</td><td><button type="button" class="btn btn-default btn-lg" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" >'+fav+'</button>'+
-                             '</td><td><button type="button" class="btn btn-default btn-lg" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
+                             '</td><td><button type="button" class="btn btn-default" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" >'+fav+'</button>'+
+                             '</td><td><button type="button" class="btn btn-default" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
                              '</td></tr>';
                   $(ele).append(row);
                 }
                 $(ele).append('</tbody>');
 
                 if(result["paging"]["previous"]&&result["paging"]["next"]){
-                  $("#"+type+" div.pagingBtn").html('<button type="button" class="btn btn-default" value="Previous" style="margin-right:20px;" onClick="responseClickPaging(\''+type+'\',\''+result["paging"]["previous"]+'\')">Next</button>');
+                  $("#"+type+" div.pagingBtn").html('<button type="button" class="btn btn-default" value="Previous" style="margin-right:20px;" onClick="responseClickPaging(\''+type+'\',\''+result["paging"]["previous"]+'\')">Previous</button>');
                   $("#"+type+" div.pagingBtn").append('<button type="button" class="btn btn-default" value="Next" onClick="responseClickPaging(\''+type+'\',\''+result["paging"]["next"]+'\')">Next</button>');
                 }else if(result["paging"]["previous"]){
-                  $("#"+type+" div.pagingBtn").html('<button type="button" class="btn btn-default" value="Previous" onClick="responseClickPaging(\''+type+'\',\''+result["paging"]["previous"]+'\')">Next</button>');
+                  $("#"+type+" div.pagingBtn").html('<button type="button" class="btn btn-default" value="Previous" onClick="responseClickPaging(\''+type+'\',\''+result["paging"]["previous"]+'\')">Previous</button>');
                 }else{
                   $("#"+type+" div.pagingBtn").html('<button type="button" class="btn btn-default" value="Next" onClick="responseClickPaging(\''+type+'\',\''+result["paging"]["next"]+'\')">Next</button>');
                 }
@@ -278,7 +286,7 @@ $(function(){
             dataType: "json",
             beforeSend: function( xhr ) {
                   $("#tbUser").css("display","none");
-                  $("#progressUser").css("display","block");
+                  $("#progressUser").css("display","flex");
             },
             success: function(result)
             {
@@ -297,8 +305,8 @@ $(function(){
                   var row = '<tr><th scope="row">'+(i+1)+
                             '</th><td><image src="'+imageurl+
                              '" width="40" height="30" /></td><td>'+name+
-                             '</td><td><button type="button" class="btn btn-default btn-lg" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" >'+fav+'</button>'+
-                             '</td><td><button type="button" class="btn btn-default btn-lg" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
+                             '</td><td><button type="button" class="btn btn-default" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" >'+fav+'</button>'+
+                             '</td><td><button type="button" class="btn btn-default" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
                              '</td></tr>';
                   $("#tbUser").append(row);
                 }
@@ -319,7 +327,7 @@ $(function(){
             dataType: "json",
             beforeSend: function( xhr ) {
                   $("#tbPage").css("display","none");
-                  $("#progressPage").css("display","block");
+                  $("#progressPage").css("display","flex");
             },
             success: function(result)
             {
@@ -337,8 +345,8 @@ $(function(){
                   var row = '<tr><th scope="row">'+(i+1)+
                             '</th><td><image src="'+imageurl+
                              '" width="40" height="30" /></td><td>'+name+
-                             '</td><td><button type="button" class="btn btn-default btn-lg" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" >'+fav+'</button>'+
-                             '</td><td><button type="button" class="btn btn-default btn-lg" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
+                             '</td><td><button type="button" class="btn btn-default" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" >'+fav+'</button>'+
+                             '</td><td><button type="button" class="btn btn-default" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
                              '</td></tr>';
                   $("#tbPage").append(row);
                 }
@@ -355,7 +363,7 @@ $(function(){
             dataType: "json",
             beforeSend: function( xhr ) {
                   $("#tbEvent").css("display","none");
-                  $("#progressEvent").css("display","block");
+                  $("#progressEvent").css("display","flex");
             },
             success: function(result)
             {
@@ -373,8 +381,8 @@ $(function(){
                   var row = '<tr><th scope="row">'+(i+1)+
                             '</th><td><image src="'+imageurl+
                              '" width="40" height="30" /></td><td>'+name+
-                             '</td><td><button type="button" class="btn btn-default btn-lg" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" >'+fav+'</button>'+
-                             '</td><td><button type="button" class="btn btn-default btn-lg" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
+                             '</td><td><button type="button" class="btn btn-default" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" >'+fav+'</button>'+
+                             '</td><td><button type="button" class="btn btn-default" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
                              '</td></tr>';
                   $("#tbEvent").append(row);
                 }
@@ -391,7 +399,7 @@ $(function(){
             dataType: "json",
             beforeSend: function( xhr ) {
                   $("#tbPlace").css("display","none");
-                  $("#progressPlace").css("display","block");
+                  $("#progressPlace").css("display","flex");
             },
             success: function(result)
             {
@@ -409,8 +417,8 @@ $(function(){
                   var row = '<tr><th scope="row">'+(i+1)+
                             '</th><td><image src="'+imageurl+
                              '" width="40" height="30" /></td><td>'+name+
-                             '</td><td><button type="button" class="btn btn-default btn-lg" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" >'+fav+'</button>'+
-                             '</td><td><button type="button" class="btn btn-default btn-lg" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
+                             '</td><td><button type="button" class="btn btn-default" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" >'+fav+'</button>'+
+                             '</td><td><button type="button" class="btn btn-default" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
                              '</td></tr>';
                   $("#tbPlace").append(row);
                 }
@@ -427,7 +435,7 @@ $(function(){
             dataType: "json",
             beforeSend: function( xhr ) {
                   $("#tbGroup").css("display","none");
-                  $("#progressGroup").css("display","block");
+                  $("#progressGroup").css("display","flex");
             },
             success: function(result)
             {
@@ -445,8 +453,8 @@ $(function(){
                   var row = '<tr><th scope="row">'+(i+1)+
                             '</th><td><image src="'+imageurl+
                              '" width="40" height="30" /></td><td>'+name+
-                             '</td><td><button type="button" class="btn btn-default btn-lg" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" >'+fav+'</button>'+
-                             '</td><td><button type="button" class="btn btn-default btn-lg" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
+                             '</td><td><button type="button" class="btn btn-default" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" >'+fav+'</button>'+
+                             '</td><td><button type="button" class="btn btn-default" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
                              '</td></tr>';
                   $("#tbGroup").append(row);
                 }

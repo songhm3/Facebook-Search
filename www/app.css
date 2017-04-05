@@ -3,7 +3,17 @@ html, body {
     height: 100%;
     -webkit-overflow-scrolling: touch;
 }
+table{
+	margin-bottom: 1px; 
+}
 
+div.myProgress{
+	height: 100%; 
+	width: 100%; 
+	display : flex; 
+	align-items : center; 
+	justify-content: center;
+}
 
 .progess{
 	display: flex;
@@ -11,15 +21,6 @@ html, body {
     justify-content: center;
 }
 
-#btnPost{
-	
-  background-image : url("../images/facebook.png");
-  height: 45px;
-  width : 45px;
-  background-size: 80%;
-  background-position: center center;
-  background-repeat: no-repeat;
-}
 
 div.detailBtns{
 	padding: 5px;
