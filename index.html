@@ -6,21 +6,31 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" >
 		<link rel="stylesheet" type="text/css" href="bootstrap-3.3.7-dist/css/bootstrap.min.css" >
 		<link rel="stylesheet" type="text/css" href="www/app.css" >
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
 	</head>
 	<body>
-		<div class="well">
-			<form id="mForm" class="form-inline">
-				<label >FB Search</label>
-				<input type="text" name="keyword" class="form-control" id="keywordInput" placeholder="type something..." required >
-				<input type="submit" class="btn btn-default" value="Submit" />
-				<button type="reset" class="btn btn-default" value="Clear" >Clear</button>
+		<div class="well well-sm" style="margin-bottom: 0px">
+
+			<form id="mForm" class="form-group" style="margin-bottom: 0px">
+				<span class="control-label col-md-3" style="color: #337AB7;" >FB Search</span>
+				<span class="input-group col-md-9">
+			      <input type="text" name="keyword" class="form-control" id="keywordInput" placeholder="type something...">
+			      <span class="input-group-btn">
+			        <button class="btn btn-primary" type="submit" >
+			        	<span class="glyphicon glyphicon-search" aria-hidden="true" style="color:white;"></span>
+			        </button>
+			      </span>
+			      <span class="input-group-btn col-md-3">
+			        <button type="reset" class="btn btn-default" value="Clear" style="border:1px solid #337AB7; color: #337AB7;">Clear</button>
+			      </span>
+			    </span>
+			     
 			</form>
-			
 		</div>
-		<div>
+		<div style="height: 100%;width: 100%;">
 
 			  <!-- Nav pills -->
-			  <ul class="nav nav-pills nav-justified">
+			  <ul class="nav nav-pills nav-justified" style="border-bottom: 2px solid #337AB7;">
 			    <li class="active"><a href="#user" data-toggle="tab">Users</a></li>
 			    <li ><a href="#page"  data-toggle="tab">Pages</a></li>
 			    <li ><a href="#event"  data-toggle="tab">Events</a></li>
@@ -64,63 +74,62 @@
 
 
 			  <!-- Tab panes -->
-			  <div class="tab-content">
-			    <div role="tabpanel" class="tab-pane fade in active" id="user">        
+			  <div class="tab-content" style="height:100%; width:100%;">
+			    <div role="tabpanel" class="tab-pane fade in active" id="user" style="text-align:center;height:100%; width:100%;">        
 					  <table class="table table-hover" id="tbUser">
 					  </table>
-					   <div class="progress" id = "progressUser" style="display:none;" >
-  						<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 45%">
+					  <div class="pagingBtn" style="text-align: center; width:100%;"></div>
+					   <div class="progress" id = "progressUser" style=" display:none; width: 50%; " >
+  						<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 45%;">
     					<span class="sr-only">45% Complete</span>
   						</div>
 					  </div>
-
-
 			    </div>
-			    <div role="tabpanel" class="tab-pane fade" id="page">
+			    <div role="tabpanel" class="tab-pane fade" id="page" style="height:100%; width:100%;">
 			 
 					  <table class="table table-hover" id="tbPage">
 					  </table>
-					  <div class="progress" id="progressPage" style="display:none;" >
+					  <div class="progress" id="progressPage" style="display:none; width: 50%;" >
   						<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 45%">
     					<span class="sr-only">45% Complete</span>
   						</div>
 					  </div>
 			    </div>
-			    <div role="tabpanel" class="tab-pane fade" id="event">
+			    <div role="tabpanel" class="tab-pane fade" id="event" style="height:100%; width:100%;">
 			         
 					  <table class="table table-hover" id="tbEvent">
 					  </table>
-						<div class="progress" id="progressEvent" style="display:none;" >
+						<div class="progress" id="progressEvent" style="display:none; width: 50%;" >
   						<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 45%">
     					<span class="sr-only">45% Complete</span>
   						</div>
 					  </div>
 			    </div>
-			    <div role="tabpanel" class="tab-pane fade" id="place">
+			    <div role="tabpanel" class="tab-pane fade" id="place" style="height:100%; width:100%;">
 			            
 					  <table class="table table-hover" id="tbPlace">
 					  </table>
-			          <div class="progress" id="progressPlace" style="display:none;" >
+			          <div class="progress" id="progressPlace" style="display:none;width: 50%;" >
   						<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 45%">
     					<span class="sr-only">45% Complete</span>
   						</div>
 					  </div>
 			    </div>
-			    <div role="tabpanel" class="tab-pane fade" id="group">
+			    <div role="tabpanel" class="tab-pane fade" id="group" style="height:100%; width:100%;">
 			            
 					  <table class="table table-hover" id="tbGroup">
 					  </table>
-					  <div class="progress" id="progressGroup" style="display:none;" >
+					  <div class="progress" id="progressGroup" style="display:none;width: 50%;" >
   						<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 45%">
     					<span class="sr-only">45% Complete</span>
   						</div>
 					  </div>
 			    </div>
-			    <div role="tabpanel" class="tab-pane fade" id="favorite">
+			    <div role="tabpanel" class="tab-pane fade" id="favorite" style="height:100%; width:100%;">
 			            
 					  <table class="table table-hover" id="tbFav">
 					  </table>
-				      <div class="progress" id="progressFav" style="display:none;" >
+				      <div class="progress" id="progressFav" style="display:none;width: 50%;" >
   						<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 45%">
     					<span class="sr-only">45% Complete</span>
   						</div>
@@ -133,7 +142,6 @@
 
 		<script src="http://code.jquery.com/jquery.min.js"></script>
 		<script src="bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
-		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
 		<script type="text/javascript" src="www/app.js"></script>
 	</body>
 </html>
