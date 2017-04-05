@@ -95,7 +95,7 @@ function getPicture(index,id){
           var imageurl = result["images"][result["images"].length-1]["source"];
           var ele = "#collapse"+index+" .panel-body";
           //alert(ele);
-          $(ele).append('<img style="display:block;max-height:100%;max-width:100%" src="'+imageurl+'">');
+          $(ele).append('<img style=" width:100%; " src="'+imageurl+'">');
       }
 
     });
@@ -103,6 +103,7 @@ function getPicture(index,id){
 
 function responseClickBack(){
   $(".detail").css("display","none");
+  $(".pagingBtn").css("display","block");
   $("table").css("display","table");
   $("#btnFav").css("display","none");
   $("#btnPost").css("display","none");
@@ -116,6 +117,7 @@ function responseClickDetail(type,id,imageurl,itemName){
             dataType: "json",
             beforeSend: function( xhr ) {
                   $("table").css("display","none");
+                  $(".pagingBtn").css("display","none");
                   $(".detail").css("display","block");
                   $("#progressAlbums").css("display","block");
                   $("#progressPosts").css("display","block");
@@ -178,7 +180,7 @@ function responseClickDetail(type,id,imageurl,itemName){
                   }
                   $(".albumContainer").append('</div>');
                 }else{
-                  alert("No album data found");
+                  //alert("No album data found");
                   $(".albumContainer").html("<p>No data found.</p>");
                 }
 
