@@ -51,12 +51,13 @@ function generateFav(){
                 '" width="40" height="30" /></td><td>'+name+
                 '</td><td>'+type+
                 '</td><td>'+'<button type="button" class="btn btn-default" onClick="responseClickTrash(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" ><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>'+
-                '</td><td>'+'<button type="button" class="btn btn-default" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')"><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
+                '</td><td>'+'<button type="button" class="btn btn-default" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+escape(imageurl)+'\',\''+escape(name)+'\')"><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
                 '</td></tr>';
       $("#tbFav").append(row);
     }
     $("#tbFav").append('</tbody>');
   }else{
+    //alert("test");
     $("#tbFav").html("");
   }
 }
@@ -72,9 +73,10 @@ function responseClickFavorite(type,id,url,name){
   var btn = "#"+id;
   if(localStorage.getItem(id)==null){
     //alert("not storage");
-    var item = {"type":type,"id":id,"url":url,"name":unescape(name)};
+    var item = {"type":type,"id":id,"url":unescape(url),"name":unescape(name)};
     localStorage.setItem(id,JSON.stringify(item));
     $(btn).html('<span class="glyphicon glyphicon-star" aria-hidden="true"   style="color:gold"> </span>');
+    //alert(btn);
   }else{
     //alert("storage");
     localStorage.removeItem(id);
@@ -112,6 +114,8 @@ function responseClickBack(){
 }
 
 function responseClickDetail(type,id,imageurl,itemName){
+
+
     $.ajax({
             type: "GET",
             url: "server/app.php",   //relative to html which incorporates this script
@@ -126,24 +130,26 @@ function responseClickDetail(type,id,imageurl,itemName){
             },
             success: function(result)
             {
+
                 $("#progressAlbums").css("display","none");
                 $("#progressPosts").css("display","none");
+                if(localStorage.getItem(id)==null){
+                    $("#btnFav").html('<span class="glyphicon glyphicon-star-empty" aria-hidden="true" ></span>');
+                }else{
+                    $("#btnFav").html('<span class="glyphicon glyphicon-star" aria-hidden="true" style="color:gold"></span>');
+                }
                 $("#btnFav").css("display","inline-block");
                 $("#btnPost").css("display","inline-block");
                 $("#btnFav").click(function(){
+
                   if(localStorage.getItem(id)==null){
-                    var item = {"type":type,"id":id,"url":imageurl,"name":unescape(itemName)};
-                    localStorage.setItem(id,JSON.stringify(item));
-                    //alert($("#btnFav").html());
+                    responseClickFavorite(type,id,imageurl,itemName);
                     $("#btnFav").html('<span class="glyphicon glyphicon-star" aria-hidden="true" style="color:gold"></span>');
-                    //alert($("#btnFav").html());
-                    //alert("not storage");
                   }else{
-                    localStorage.removeItem(id);
+                    responseClickTrash(type,id,imageurl,itemName);
                     $("#btnFav").html('<span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>');
-                    //alert("storage");
                   }
-                  generateFav();
+                  
                 });
 
                 $("#btnPost").click(function(){
@@ -151,7 +157,7 @@ function responseClickDetail(type,id,imageurl,itemName){
                          app_id: '1141555312636527',
                          method: 'feed',
                          link: window.location.href,
-                         picture: imageurl,
+                         picture: unescape(imageurl),
                          name: unescape(itemName),
                          caption: "FB SEARCH FROM USC CSCI571",
                          }, function(response){
@@ -164,7 +170,7 @@ function responseClickDetail(type,id,imageurl,itemName){
                       });
                 });
 
-
+                
                 if(result["albums"]){
                   var albums = result["albums"]["data"];
                   $(".albumContainer").html('<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">');
@@ -172,9 +178,9 @@ function responseClickDetail(type,id,imageurl,itemName){
                   for(var i = 0 ; i < albums.length; i++){
 
                     var name = albums[i]["name"];
-                
-                    getPicture(i,albums[i]["photos"]["data"][0]["id"]);
-                    getPicture(i,albums[i]["photos"]["data"][1]["id"]);
+                    //alert(name);
+                    if(albums[i]["photos"]) getPicture(i,albums[i]["photos"]["data"][0]["id"]);
+                    if(albums[i]["photos"]) getPicture(i,albums[i]["photos"]["data"][1]["id"]);
                     
                     if(i==0) {
                       $(".albumContainer").append('<div class="panel panel-default"><div class="panel-heading" ><h4 class="panel-title"><a data-toggle="collapse" data-parent="#accordion" href="#collapse'+i+'">'+
@@ -187,6 +193,7 @@ function responseClickDetail(type,id,imageurl,itemName){
                     }
                   }
                   $(".albumContainer").append('</div>');
+                  
                 }else{
                   //alert("No album data found");
                   $(".albumContainer").html('<div class="well well-sm" style="background-color:#FCF8E3; " >No data found.</div>');
@@ -196,7 +203,7 @@ function responseClickDetail(type,id,imageurl,itemName){
                   var posts = result["posts"]["data"];
                   $(".postContainer").html('<ul class="list-group" >');
                   for(var i = 0 ; i < posts.length; i++){
-                    $(".postContainer").append('<li class="list-group-item" ><div><div style=" display : inline-block; vertical-align: middle; "><image src="'+imageurl+
+                    $(".postContainer").append('<li class="list-group-item" ><div><div style=" display : inline-block; vertical-align: middle; "><image src="'+unescape(imageurl)+
                       '" width="30" height="30" /></div><div style="display:inline-block; vertical-align: middle; margin-left:15px; "><span><b>'+unescape(itemName)+
                       '</b></span><br><small>'+moment(posts[i]["created_time"]).utc().format("YYYY-MM-DD HH:mm:ss")+'</small></div></div><br><p>'+(posts[i]["message"]?posts[i]["message"]:"")+'</p></li>');
         
@@ -209,6 +216,47 @@ function responseClickDetail(type,id,imageurl,itemName){
                   $(".postContainer").html('<div class="well well-sm" style="background-color:#FCF8E3; " >No data found.</div>');
                 }
                 
+            },
+            error: function(error){
+              $("#progressAlbums").css("display","none");
+              $("#progressPosts").css("display","none");
+              if(localStorage.getItem(id)==null){
+                    $("#btnFav").html('<span class="glyphicon glyphicon-star-empty" aria-hidden="true" ></span>');
+                }else{
+                    $("#btnFav").html('<span class="glyphicon glyphicon-star" aria-hidden="true" style="color:gold"></span>');
+                }
+                $("#btnFav").css("display","inline-block");
+                $("#btnPost").css("display","inline-block");
+                $("#btnFav").click(function(){
+
+                  if(localStorage.getItem(id)==null){
+                    $("#btnFav").html('<span class="glyphicon glyphicon-star" aria-hidden="true" style="color:gold"></span>');
+                  }else{
+                    $("#btnFav").html('<span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>');
+                  }
+                  responseClickFavorite(type,id,imageurl,itemName);
+                });
+
+                $("#btnPost").click(function(){
+                    FB.ui({
+                         app_id: '1141555312636527',
+                         method: 'feed',
+                         link: window.location.href,
+                         picture: unescape(imageurl),
+                         name: unescape(itemName),
+                         caption: "FB SEARCH FROM USC CSCI571",
+                         }, function(response){
+                         if (response && !response.error_message){
+                            alert("Posted Successfully");
+                         }
+                         else{
+                            alert("Not Posted");
+                         }
+                      });
+                });
+
+              $(".albumContainer").html('<div class="well well-sm" style="background-color:#FCF8E3; " >No data found.</div>');
+              $(".postContainer").html('<div class="well well-sm" style="background-color:#FCF8E3; " >No data found.</div>');
             }
 
       });
@@ -241,8 +289,8 @@ function responseClickPaging(type, pageUrl){
                   var row = '<tr><th scope="row">'+(i+1)+
                             '</th><td><image src="'+imageurl+
                              '" width="40" height="30" /></td><td>'+name+
-                             '</td><td><button type="button" class="btn btn-default" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" >'+fav+'</button>'+
-                             '</td><td><button type="button" class="btn btn-default" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
+                             '</td><td><button type="button" class="btn btn-default" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+escape(imageurl)+'\',\''+escape(name)+'\')" >'+fav+'</button>'+
+                             '</td><td><button type="button" class="btn btn-default" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+escape(imageurl)+'\',\''+escape(name)+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
                              '</td></tr>';
                   $(ele).append(row);
                 }
@@ -253,8 +301,10 @@ function responseClickPaging(type, pageUrl){
                   $("#"+type+" div.pagingBtn").append('<button type="button" class="btn btn-default" value="Next" onClick="responseClickPaging(\''+type+'\',\''+result["paging"]["next"]+'\')">Next</button>');
                 }else if(result["paging"]["previous"]){
                   $("#"+type+" div.pagingBtn").html('<button type="button" class="btn btn-default" value="Previous" onClick="responseClickPaging(\''+type+'\',\''+result["paging"]["previous"]+'\')">Previous</button>');
-                }else{
+                }else if(result["paging"]["next"]){
                   $("#"+type+" div.pagingBtn").html('<button type="button" class="btn btn-default" value="Next" onClick="responseClickPaging(\''+type+'\',\''+result["paging"]["next"]+'\')">Next</button>');
+                }else{
+
                 }
                 
                 
@@ -275,17 +325,21 @@ $(function(){
     generateFav();
 
 
-
+    $('button[type="reset"]').click(function(){
+      $("table").css("display","none");
+      $(".pagingBtn").html("");
+    });
 
     $("#mForm").submit(function(event) {
       event.preventDefault();
+      $(".detail").css("display","none");
       $.ajax({
             type: "GET",
             url: "server/app.php",   //relative to html which incorporates this script
             data: { operation:"user", keyword:$("#keywordInput").val() }, 
             dataType: "json",
             beforeSend: function( xhr ) {
-                  $("#tbUser").css("display","none");
+                  //$("#tbUser").css("display","none");
                   $("#progressUser").css("display","flex");
             },
             success: function(result)
@@ -305,16 +359,16 @@ $(function(){
                   var row = '<tr><th scope="row">'+(i+1)+
                             '</th><td><image src="'+imageurl+
                              '" width="40" height="30" /></td><td>'+name+
-                             '</td><td><button type="button" class="btn btn-default" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" >'+fav+'</button>'+
-                             '</td><td><button type="button" class="btn btn-default" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
+                             '</td><td><button type="button" class="btn btn-default" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+escape(imageurl)+'\',\''+escape(name)+'\')" >'+fav+'</button>'+
+                             '</td><td><button type="button" class="btn btn-default" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+escape(imageurl)+'\',\''+escape(name)+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
                              '</td></tr>';
                   $("#tbUser").append(row);
                 }
                 $("#tbUser").append('</tbody>');
 
-                $("#user div.pagingBtn").html('<button type="button" class="btn btn-default" value="Next" onClick="responseClickPaging(\''+type+'\',\''+pageUrl+'\')">Next</button>');
+                if(pageUrl) $("#user div.pagingBtn").html('<button type="button" class="btn btn-default" value="Next" onClick="responseClickPaging(\''+type+'\',\''+pageUrl+'\')">Next</button>');
                 
-                $('a[href="#user"]').tab('show');
+                //$('a[href="#user"]').tab('show');
                 
             }
 
@@ -337,6 +391,7 @@ $(function(){
                 $("#tbPage").append('<tbody>');
                 var items= result["data"];
                 var type = "page";
+                var pageUrl = result["paging"]["next"];
                 for(var i=0 ; i < items.length; i++){
                   var imageurl = items[i]["picture"]["data"]["url"];
                   var name = items[i]["name"];
@@ -345,12 +400,13 @@ $(function(){
                   var row = '<tr><th scope="row">'+(i+1)+
                             '</th><td><image src="'+imageurl+
                              '" width="40" height="30" /></td><td>'+name+
-                             '</td><td><button type="button" class="btn btn-default" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" >'+fav+'</button>'+
-                             '</td><td><button type="button" class="btn btn-default" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
+                             '</td><td><button type="button" class="btn btn-default" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+escape(imageurl)+'\',\''+escape(name)+'\')" >'+fav+'</button>'+
+                             '</td><td><button type="button" class="btn btn-default" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+escape(imageurl)+'\',\''+escape(name)+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
                              '</td></tr>';
                   $("#tbPage").append(row);
                 }
                 $("#tbPage").append('</tbody>');
+                $("#page div.pagingBtn").html('<button type="button" class="btn btn-default" value="Next" onClick="responseClickPaging(\''+type+'\',\''+pageUrl+'\')">Next</button>');
             }
             
 
@@ -373,6 +429,7 @@ $(function(){
                 $("#tbEvent").append('<tbody>');
                 var items= result["data"];
                 var type = "event";
+                var pageUrl = result["paging"]["next"];
                 for(var i=0 ; i < items.length; i++){
                   var imageurl = items[i]["picture"]["data"]["url"];
                   var name = items[i]["name"];
@@ -381,12 +438,14 @@ $(function(){
                   var row = '<tr><th scope="row">'+(i+1)+
                             '</th><td><image src="'+imageurl+
                              '" width="40" height="30" /></td><td>'+name+
-                             '</td><td><button type="button" class="btn btn-default" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" >'+fav+'</button>'+
-                             '</td><td><button type="button" class="btn btn-default" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
+                             '</td><td><button type="button" class="btn btn-default" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+escape(imageurl)+'\',\''+escape(name)+'\')" >'+fav+'</button>'+
+                             '</td><td><button type="button" class="btn btn-default" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+escape(imageurl)+'\',\''+escape(name)+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
                              '</td></tr>';
                   $("#tbEvent").append(row);
                 }
+
                 $("#tbEvent").append('</tbody>');
+                if(pageUrl)  $("#event div.pagingBtn").html('<button type="button" class="btn btn-default" value="Next" onClick="responseClickPaging(\''+type+'\',\''+pageUrl+'\')">Next</button>');
             }
             
 
@@ -409,6 +468,7 @@ $(function(){
                 $("#tbPlace").append('<tbody>');
                 var items= result["data"];
                 var type = "place";
+                var pageUrl = result["paging"]["next"];
                 for(var i=0 ; i < items.length; i++){
                   var imageurl = items[i]["picture"]["data"]["url"];
                   var name = items[i]["name"];
@@ -417,12 +477,13 @@ $(function(){
                   var row = '<tr><th scope="row">'+(i+1)+
                             '</th><td><image src="'+imageurl+
                              '" width="40" height="30" /></td><td>'+name+
-                             '</td><td><button type="button" class="btn btn-default" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" >'+fav+'</button>'+
-                             '</td><td><button type="button" class="btn btn-default" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
+                             '</td><td><button type="button" class="btn btn-default" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+escape(imageurl)+'\',\''+escape(name)+'\')" >'+fav+'</button>'+
+                             '</td><td><button type="button" class="btn btn-default" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+escape(imageurl)+'\',\''+escape(name)+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
                              '</td></tr>';
                   $("#tbPlace").append(row);
                 }
                 $("#tbPlace").append('</tbody>');
+                if(pageUrl)  $("#place div.pagingBtn").html('<button type="button" class="btn btn-default" value="Next" onClick="responseClickPaging(\''+type+'\',\''+pageUrl+'\')">Next</button>');
             }
             
 
@@ -445,6 +506,7 @@ $(function(){
                 $("#tbGroup").append('<tbody>');
                 var items= result["data"];
                 var type = "group";
+                var pageUrl = result["paging"]["next"];
                 for(var i=0 ; i < items.length; i++){
                   var imageurl = items[i]["picture"]["data"]["url"];
                   var name = items[i]["name"];
@@ -453,12 +515,15 @@ $(function(){
                   var row = '<tr><th scope="row">'+(i+1)+
                             '</th><td><image src="'+imageurl+
                              '" width="40" height="30" /></td><td>'+name+
-                             '</td><td><button type="button" class="btn btn-default" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" >'+fav+'</button>'+
-                             '</td><td><button type="button" class="btn btn-default" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+imageurl+'\',\''+escape(name)+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
+                             '</td><td><button type="button" class="btn btn-default" id=\"'+id+'\" onClick="responseClickFavorite(\''+type+'\',\''+id+'\',\''+escape(imageurl)+'\',\''+escape(name)+'\')" >'+fav+'</button>'+
+                             '</td><td><button type="button" class="btn btn-default" onClick="responseClickDetail(\''+type+'\',\''+id+'\',\''+escape(imageurl)+'\',\''+escape(name)+'\')" ><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>'+
                              '</td></tr>';
                   $("#tbGroup").append(row);
                 }
+
                 $("#tbGroup").append('</tbody>');
+
+                if(pageUrl) $("#group div.pagingBtn").html('<button type="button" class="btn btn-default" value="Next" onClick="responseClickPaging(\''+type+'\',\''+pageUrl+'\')">Next</button>');
             }
             
 
