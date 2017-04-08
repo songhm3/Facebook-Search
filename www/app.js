@@ -353,7 +353,7 @@ $(function(){
   });
 
     $('button[type="reset"]').click(function(){
-      $("table").css("display","none");
+      $(".table").html("");
       $(".pagingBtn").html("");
     });
 
