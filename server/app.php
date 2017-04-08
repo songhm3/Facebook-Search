@@ -1,10 +1,10 @@
 <?php
 	require_once __DIR__ . '/php-graph-sdk-5.0.0/src/Facebook/autoload.php';
-	define("ACCESS_TOKEN",'EAAQOPQ7msm8BAL7ByGZACz4fZBME7r1xaMJCKYHSFuCV7z5zihDPL9ZBy5sG7hEZC597Awq2FTNxpK7K582vF9aMEu5wzALsV0EJwTDCgx3SZBf07tsP44KRfNQB9p0ykNkjlJ23miwOGEvVERKQo4OK0Kzj10ZBAZD');
+	define("ACCESS_TOKEN",'EAABnPCLHeBoBAPoDWCsJzd9yMYpNBHeyGG8PkytYZAUZB4ABbWExdrh2OoFAstBw8UqSYbMyjwbwu2gTLphZCGP5vFOf0vsVKB7jzTvPYQE4qT7Km1N1h0d2BrkE33KnpAx7ztxpTYZCUGl3R0yRiszMYJWeIbQZD');
 
 	$fb = new Facebook\Facebook([
-		  'app_id' => '1141555312636527',
-		  'app_secret' => 'b38228f0e6105c68d025d42b0318a678',
+		  'app_id' => '113507979196442',
+		  'app_secret' => '9ba1ec02deb976891cd23a3b208e4f6c',
 		  'default_graph_version' => 'v2.8',
 		 ]);
 	header('Content-Type: application/json');
