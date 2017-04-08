@@ -7,7 +7,9 @@
 		  'app_secret' => '9ba1ec02deb976891cd23a3b208e4f6c',
 		  'default_graph_version' => 'v2.8',
 		 ]);
+	
 	header('Content-Type: application/json');
+	header('Access-Control-Allow-Origin: *');
 
 	if(isset($_GET["operation"])){
 		$operation = $_GET["operation"];
