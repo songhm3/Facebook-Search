@@ -21,7 +21,7 @@ window.fbAsyncInit = function() {
 
 var latitude;
 var longitude;
-
+var phpServer = "http://fb-env.ybgricvzi9.us-west-2.elasticbeanstalk.com/index.php";
 
 
 function getLocation() {
@@ -92,7 +92,7 @@ function responseClickFavorite(type,id,url,name){
 function getPicture(index,id){
   $.ajax({
       type: "GET",
-      url: "server/app.php",   //relative to html which incorporates this script
+      url: phpServer,   //relative to html which incorporates this script
       data: { operation:"picture", id: id}, 
       dataType: "json",
       success: function(result)
@@ -133,7 +133,7 @@ function responseClickDetail(type,id,imageurl,itemName){
     //alert("responseClickDetail("+type+" "+id+")");
     $.ajax({
             type: "GET",
-            url: "server/app.php",   //relative to html which incorporates this script
+            url: phpServer,   //relative to html which incorporates this script
             data: { operation:"detail", id:id }, 
             dataType: "json",
             beforeSend: function( xhr ) {
@@ -291,7 +291,7 @@ function responseClickPaging(type, pageUrl){
   $.ajax({
             type: "GET",
             url: pageUrl,    
-            dataType: "jsonp",
+            dataType: "json",
             success: function(result)
             {
                 
@@ -362,7 +362,7 @@ $(function(){
       $(".detail").css("left","-100%");
       $.ajax({
             type: "GET",
-            url: "server/app.php",   //relative to html which incorporates this script
+            url: phpServer,   //relative to html which incorporates this script
             data: { operation:"user", keyword:$("#keywordInput").val() }, 
             dataType: "json",
             beforeSend: function( xhr ) {
@@ -403,7 +403,7 @@ $(function(){
 
       $.ajax({
             type: "GET",
-            url: "server/app.php",
+            url: phpServer,
             data: { operation:"page", keyword:$("#keywordInput").val() }, 
             dataType: "json",
             beforeSend: function( xhr ) {
@@ -441,7 +441,7 @@ $(function(){
 
       $.ajax({
             type: "GET",
-            url: "server/app.php",
+            url: phpServer,
             data: { operation:"event", keyword:$("#keywordInput").val() }, 
             dataType: "json",
             beforeSend: function( xhr ) {
@@ -479,7 +479,7 @@ $(function(){
 
       $.ajax({
             type: "GET",
-            url: "server/app.php",
+            url: phpServer,
             data: { operation:"place", keyword:$("#keywordInput").val(),latitude: latitude, longitude:longitude}, 
             dataType: "json",
             beforeSend: function( xhr ) {
@@ -519,7 +519,7 @@ $(function(){
 
       $.ajax({
             type: "GET",
-            url: "server/app.php",
+            url: phpServer,
             data: { operation:"group", keyword:$("#keywordInput").val() }, 
             dataType: "json",
             beforeSend: function( xhr ) {
