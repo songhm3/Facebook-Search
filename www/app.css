@@ -35,25 +35,39 @@ div.detailBtns{
 }
 
 div.container {
-	width: 100%;
+    width: 100%;
     display: inline-block;
 }
 
-div.albums {
-	width: 48%;
-    float:left;
-    vertical-align:top;
-    margin-left:0px;
-    margin-right:auto;
-    border: 1px solid #dddddd;
+@media screen and (min-width: 720px) {
+    div.albums { 
+        width: 48%;
+        float: left;
+        padding: 0px;
+        border: 1px solid #dddddd;
+    }
+
+    div.posts{
+        width: 48%;
+        float: right;
+        padding: 0px;
+        border: 1px solid #dddddd;
+    }
 }
 
-div.posts{
-	width: 48%;
-    float: right;
-    vertical-align:top;
-    border: 1px solid #dddddd;
+@media screen and (min-width: 0px) {
+    div.albums { 
+        padding: 0px;
+        border: 1px solid #dddddd;
+    }
+
+    div.posts{
+        padding: 0px;
+        border: 1px solid #dddddd;
+    }
 }
+
+
 
 .list-group-item {
     display: block;

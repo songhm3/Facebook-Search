@@ -189,7 +189,7 @@ function responseClickDetail(type,id,imageurl,itemName){
                 
                 if(result["albums"]){
                   var albums = result["albums"]["data"];
-                  $(".albumContainer").html('<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">');
+                  $(".albumContainer").html('<div class="panel-group" id="accordion" ');
 
                   for(var i = 0 ; i < albums.length; i++){
 
